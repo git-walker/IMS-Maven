@@ -231,6 +231,13 @@
       <version>${mysql.driver.version}</version>
       <scope>runtime</scope>
     </dependency>
+
+    <!-- mybatis物理分页插件 -->
+    <dependency>
+      <groupId>com.github.pagehelper</groupId>
+      <artifactId>pagehelper</artifactId>
+      <version>5.1.2</version>
+    </dependency>
     <!-- PERSISTENCE end -->
 
     <!-- 第三部分：Servlet web -->

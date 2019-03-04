@@ -41,6 +41,20 @@
         <property name="typeAliasesSuperType" value="cn.rootyu.base.persistence.BaseEntity"/>
         <property name="mapperLocations" value="classpath:/mapper/**/*.xml"/>
         <property name="configLocation" value="classpath:/mybatis-config.xml"/>
+        <!-- 配置插件 -->
+        <property name="plugins">
+            <array>
+                <!-- 分页插件 -->
+                <bean class="com.github.pagehelper.PageInterceptor">
+                    <property name="properties">
+                        <!-- config params as the following -->
+                        <value>
+                            param1=mysql
+                        </value>
+                    </property>
+                </bean>
+            </array>
+        </property>
     </bean>
 
     <!-- 配置事务管理器 -->
@@ -87,10 +101,6 @@
         <property name="testWhileIdle" value="true" />
         <property name="testOnBorrow" value="false" />
         <property name="testOnReturn" value="false" />
-
-        <!-- 打开PSCache，并且指定每个连接上PSCache的大小（Oracle使用）
-        <property name="poolPreparedStatements" value="true" />
-        <property name="maxPoolPreparedStatementPerConnectionSize" value="20" /> -->
 
         <!-- 配置监控统计拦截的filters -->
         <property name="filters" value="stat" />
