@@ -45,15 +45,7 @@
 
     <!-- 类型别名 -->
     <typeAliases>
-        <typeAlias alias="Page" type="cn.rootyu.base.persistence.Page" /><!--分页  -->
+        <typeAlias alias="Page" type="cn.rootyu.rad.common.persistence.Page" /><!--分页  -->
     </typeAliases>
-
-    <!--&lt;!&ndash; 插件配置 &ndash;&gt;-->
-    <!--<plugins>-->
-        <!--<plugin interceptor="com.github.pagehelper.PageHelper">-->
-            <!--<property name="dialect" value="mysql" />-->
-            <!--<property name="reasonable" value="true" />-->
-        <!--</plugin>-->
-    <!--</plugins>-->
 
 </configuration>

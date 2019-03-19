@@ -1,6 +1,6 @@
 package cn.rootyu.ims.demo.dao;
 
-import cn.rootyu.base.persistence.annotation.MyBatisDao;
+import cn.rootyu.rad.common.persistence.annotation.MyBatisDao;
 
 @MyBatisDao
 public interface DemoDao {

@@ -1,4 +1,0 @@
-package cn.rootyu.base.persistence;
-
-public class Page {
-}

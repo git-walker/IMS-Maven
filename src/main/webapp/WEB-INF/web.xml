@@ -5,6 +5,18 @@
          id="WebApp_ID" version="3.1">
 
   <display-name>IMS</display-name>
+
+  <!-- 配置 spring 监听器 -->
+  <!-- needed for ContextLoaderListener -->
+  <context-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>classpath*:/spring-context*.xml</param-value>
+  </context-param>
+  <!-- Bootstraps the root web application context before servlet initialization -->
+  <listener>
+    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>
+
   <!-- 过滤器解决中文乱码问题、强制编码 UTF-8 -->
   <filter>
     <filter-name>characterEncodingFilter</filter-name>
@@ -23,13 +35,27 @@
     <url-pattern>/*</url-pattern>
   </filter-mapping>
 
+  <!--shiro过滤器 -->
+  <filter>
+    <filter-name>shiroFilter</filter-name>
+    <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+    <init-param>
+      <param-name>targetFilterLifecycle</param-name>
+      <param-value>true</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>shiroFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
   <!-- 配置 springMVC 基本配置 -->
   <servlet>
     <servlet-name>springMVC</servlet-name>
     <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
     <init-param>
       <param-name>contextConfigLocation</param-name>
-      <param-value>classpath:spring-mvc.xml</param-value>
+      <param-value>classpath*:/spring-mvc*.xml</param-value>
     </init-param>
     <load-on-startup>1</load-on-startup>
   </servlet>
@@ -37,17 +63,6 @@
     <servlet-name>springMVC</servlet-name>
     <url-pattern>/</url-pattern>
   </servlet-mapping>
-
-  <!-- 配置 spring 监听器 -->
-  <!-- needed for ContextLoaderListener -->
-  <context-param>
-    <param-name>contextConfigLocation</param-name>
-    <param-value>classpath:applicationContext.xml</param-value>
-  </context-param>
-  <!-- Bootstraps the root web application context before servlet initialization -->
-  <listener>
-    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-  </listener>
 
   <servlet>
     <servlet-name>DruidStatView</servlet-name>
@@ -61,9 +76,4 @@
     <servlet-name>DruidStatView</servlet-name>
     <url-pattern>/druid/*</url-pattern>
   </servlet-mapping>
-
-  <!-- 配置欢迎页 -->
-  <welcome-file-list>
-    <welcome-file>index.jsp</welcome-file>
-  </welcome-file-list>
 </web-app>
