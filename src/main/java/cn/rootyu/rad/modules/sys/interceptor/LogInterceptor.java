@@ -49,7 +49,6 @@ public class LogInterceptor extends BaseService implements HandlerInterceptor {
         // 保存日志
         String uri = request.getContextPath()+ Global.getAdminPath()+"/sys/notify/count";
         if(!request.getRequestURI().equals(uri)){
-//			LogUtils.saveLog(request, handler, ex, null);
 
             // 打印JVM信息。
             if (logger.isDebugEnabled()){

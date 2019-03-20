@@ -4,8 +4,8 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * 字符串工具类, 继承org.apache.commons.lang3.StringUtils类
- * @author DHC
- * @version 2013-05-22
+ * @author yuhui
+ * @version 1.0
  */
 public class StringUtils extends org.apache.commons.lang3.StringUtils {
 	

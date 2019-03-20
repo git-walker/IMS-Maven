@@ -1,6 +1,3 @@
-/**
- * Copyright (c) 2005-2012 springside.org.cn
- */
 package cn.rootyu.rad.common.utils;
 
 import javax.servlet.http.HttpServletRequest;

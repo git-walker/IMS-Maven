@@ -37,16 +37,16 @@ public class RoleListType {
 //		return roleList.size()>0?roleList:null;
 //	}
 
-	/**
-	 * 设置对象值（导出）
-	 */
-	public static String setValue(Object val) {
-		if (val != null){
-			@SuppressWarnings("unchecked")
-			List<Role> roleList = (List<Role>)val;
-			return Collections3.extractToString(roleList, "name", ", ");
-		}
-		return "";
-	}
+//	/**
+//	 * 设置对象值（导出）
+//	 */
+//	public static String setValue(Object val) {
+//		if (val != null){
+//			@SuppressWarnings("unchecked")
+//			List<Role> roleList = (List<Role>)val;
+//			return Collections3.extractToString(roleList, "name", ", ");
+//		}
+//		return "";
+//	}
 	
 }

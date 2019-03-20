@@ -45,7 +45,17 @@
 
     <!-- 类型别名 -->
     <typeAliases>
-        <typeAlias alias="Page" type="cn.rootyu.rad.common.persistence.Page" /><!--分页  -->
+        <typeAlias alias="Page" type="cn.rootyu.rad.common.dao.Page" /><!--分页  -->
     </typeAliases>
+
+    <!-- 插件配置 -->
+    <plugins>
+        <plugin interceptor="com.github.pagehelper.PageInterceptor">
+            <!--<property name="dialect" value="mysql" />-->
+            <!-- 启用合理化时，如果pageNum<1会查询第一页，如果pageNum>pages会查询最后一页 -->
+            <!-- 禁用合理化时，如果pageNum<1或pageNum>pages会返回空数据 -->
+            <property name="reasonable" value="true" />
+        </plugin>
+    </plugins>
 
 </configuration>

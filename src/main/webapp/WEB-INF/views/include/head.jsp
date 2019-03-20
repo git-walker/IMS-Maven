@@ -48,7 +48,6 @@
 <link href="${ctxStatic}/assets/css/ace-skins.min.css" type="text/css" rel="stylesheet" />
 <link href="${ctxStatic}/assets/css/ace-rtl.min.css" type="text/css" rel="stylesheet" />
 <link href="${ctxStatic}/modules/sys/css/style.css" type="text/css" rel="stylesheet">
-<script type="text/javascript">var ctx = '${ctx}', ctxStatic='${ctxStatic}';</script>
 <!-- inline styles related to this page -->
 
 <!-- ace settings handler -->

@@ -3,8 +3,8 @@
  */
 package cn.rootyu.rad.common.service;
 
-import cn.rootyu.rad.common.persistence.TreeDao;
-import cn.rootyu.rad.common.persistence.TreeEntity;
+import cn.rootyu.rad.common.dao.TreeDao;
+import cn.rootyu.rad.common.entity.TreeEntity;
 import cn.rootyu.rad.common.utils.Reflections;
 import cn.rootyu.rad.common.utils.StringUtils;
 import org.springframework.transaction.annotation.Transactional;

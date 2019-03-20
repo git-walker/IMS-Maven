@@ -1,6 +1,3 @@
-/**
- * Copyright &copy; 2012-2014 <a href="http://www.dhc.com.cn">DHC</a> All rights reserved.
- */
 package cn.rootyu.rad.modules.sys.security;
 
 import cn.rootyu.rad.common.utils.StringUtils;
@@ -17,8 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * 表单验证（包含验证码）过滤类
- * @author DHC
- * @version 2014-5-19
+ * @author yuhui
+ * @version 1.0
  */
 @Service
 public class FormAuthenticationFilter extends org.apache.shiro.web.filter.authc.FormAuthenticationFilter {

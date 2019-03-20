@@ -1,6 +1,3 @@
-/**
- * Copyright &copy; 2012-2014 <a href="http://www.dhc.com.cn">DHC</a> All rights reserved.
- */
 package cn.rootyu.rad.modules.sys.service;
 
 import cn.rootyu.rad.common.service.TreeService;
@@ -14,16 +11,13 @@ import java.util.List;
 
 /**
  * 区域Service
- * @author DHC
- * @version 2014-05-16
+ * @author yuhui
+ * @version 1.0
  */
 @Service
 @Transactional(readOnly = true)
 public class AreaService extends TreeService<AreaDao, Area> {
 
-//	public List<Area> findAll(){
-//		return UserUtils.getAreaList();
-//	}
 
 	@Transactional(readOnly = false)
 	public void save(Area area) {

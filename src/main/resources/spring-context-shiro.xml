@@ -39,6 +39,7 @@
                 <entry key="authc" value-ref="formAuthenticationFilter"/>
             </map>
         </property>
+        <!--URL的拦截-->
         <property name="filterChainDefinitions">
             <ref bean="shiroFilterChainDefinitions"/>
         </property>

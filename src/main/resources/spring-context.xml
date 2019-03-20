@@ -28,7 +28,7 @@
     <bean id="mapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
         <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
         <property name="basePackage" value="cn.rootyu"/>
-        <property name="annotationClass" value="cn.rootyu.rad.common.persistence.annotation.MyBatisDao"/>
+        <property name="annotationClass" value="cn.rootyu.rad.common.dao.annotation.MyBatisDao"/>
     </bean>
 
     <!-- MyBatis begin -->
@@ -38,23 +38,9 @@
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <property name="typeAliasesPackage" value="cn.rootyu"/>
-        <property name="typeAliasesSuperType" value="cn.rootyu.rad.common.persistence.BaseEntity"/>
+        <property name="typeAliasesSuperType" value="cn.rootyu.rad.common.entity.BaseEntity"/>
         <property name="mapperLocations" value="classpath:/mapper/**/*.xml"/>
         <property name="configLocation" value="classpath:/mybatis-config.xml"/>
-        <!-- 配置插件 -->
-        <property name="plugins">
-            <array>
-                <!-- 分页插件 -->
-                <bean class="com.github.pagehelper.PageInterceptor">
-                    <property name="properties">
-                        <!-- config params as the following -->
-                        <value>
-                            param1=mysql
-                        </value>
-                    </property>
-                </bean>
-            </array>
-        </property>
     </bean>
 
     <!-- 配置事务管理器 -->

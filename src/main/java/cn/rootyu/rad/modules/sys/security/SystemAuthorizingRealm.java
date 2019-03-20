@@ -1,6 +1,3 @@
-/**
- * Copyright &copy; 2012-2014 <a href="http://www.dhc.com.cn">DHC</a> All rights reserved.
- */
 package cn.rootyu.rad.modules.sys.security;
 
 import cn.rootyu.rad.common.utils.SpringContextHolder;
@@ -23,8 +20,8 @@ import java.util.List;
 
 /**
  * 系统安全认证实现类
- * @author DHC
- * @version 2014-7-5
+ * @author yuhui
+ * @version 1.0
  */
 @Service
 public class SystemAuthorizingRealm extends AuthorizingRealm {
