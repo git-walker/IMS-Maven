@@ -12,10 +12,17 @@
     <param-name>contextConfigLocation</param-name>
     <param-value>classpath*:/spring-context*.xml</param-value>
   </context-param>
+  <listener>
+    <listener-class>cn.rootyu.rad.modules.sys.listener.WebContextListener</listener-class>
+  </listener>
+  <listener>
+    <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+  </listener>
   <!-- Bootstraps the root web application context before servlet initialization -->
   <listener>
     <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
   </listener>
+
 
   <!-- 过滤器解决中文乱码问题、强制编码 UTF-8 -->
   <filter>
@@ -76,4 +83,13 @@
     <servlet-name>DruidStatView</servlet-name>
     <url-pattern>/druid/*</url-pattern>
   </servlet-mapping>
+
+  <error-page>
+    <error-code>500</error-code>
+    <location>/WEB-INF/views/error/500.jsp</location>
+  </error-page>
+  <error-page>
+    <error-code>404</error-code>
+    <location>/WEB-INF/views/error/404.jsp</location>
+  </error-page>
 </web-app>

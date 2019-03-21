@@ -1,12 +1,11 @@
 package cn.rootyu.rad.modules.sys.utils;
 
 
+import cn.rootyu.rad.common.service.BaseService;
 import cn.rootyu.rad.common.utils.CacheUtils;
 import cn.rootyu.rad.common.utils.SpringContextHolder;
 import cn.rootyu.rad.modules.sys.dao.*;
-import cn.rootyu.rad.modules.sys.entity.Menu;
-import cn.rootyu.rad.modules.sys.entity.Role;
-import cn.rootyu.rad.modules.sys.entity.User;
+import cn.rootyu.rad.modules.sys.entity.*;
 import cn.rootyu.rad.modules.sys.security.SystemAuthorizingRealm;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.UnavailableSecurityManagerException;
@@ -14,7 +13,10 @@ import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户工具类
@@ -60,6 +62,50 @@ public class UserUtils {
 	}
 
 	/**
+	 * 根据登录名获取用户
+	 * @param loginName
+	 * @return 取不到返回null
+	 */
+	public static User getByLoginName(String loginName){
+		User user = (User) CacheUtils.get(USER_CACHE, USER_CACHE_LOGIN_NAME_ + loginName);
+		if (user == null){
+			user = userDao.getByLoginName(new User(null, loginName));
+			if (user == null){
+				return null;
+			}
+			user.setRoleList(roleDao.findList(new Role(user)));
+			CacheUtils.put(USER_CACHE, USER_CACHE_ID_ + user.getId(), user);
+			CacheUtils.put(USER_CACHE, USER_CACHE_LOGIN_NAME_ + user.getLoginName(), user);
+		}
+		return user;
+	}
+
+	/**
+	 * 清除当前用户缓存
+	 */
+	public static void clearCache(){
+		removeCache(CACHE_ROLE_LIST);
+		removeCache(CACHE_MENU_LIST);
+		removeCache(CACHE_AREA_LIST);
+		removeCache(CACHE_OFFICE_LIST);
+		removeCache(CACHE_OFFICE_ALL_LIST);
+		UserUtils.clearCache(getUser());
+	}
+
+	/**
+	 * 清除指定用户缓存
+	 * @param user
+	 */
+	public static void clearCache(User user){
+		CacheUtils.remove(USER_CACHE, USER_CACHE_ID_ + user.getId());
+		CacheUtils.remove(USER_CACHE, USER_CACHE_LOGIN_NAME_ + user.getLoginName());
+		CacheUtils.remove(USER_CACHE, USER_CACHE_LOGIN_NAME_ + user.getOldLoginName());
+		if (user.getOffice() != null && user.getOffice().getId() != null){
+			CacheUtils.remove(USER_CACHE, USER_CACHE_LIST_BY_OFFICE_ID_ + user.getOffice().getId());
+		}
+	}
+
+	/**
 	 * 获取当前用户
 	 * @return 取不到返回 new User()
 	 */
@@ -77,29 +123,24 @@ public class UserUtils {
 	}
 
 	/**
-	 * 获取授权主要对象
+	 * 获取当前用户角色列表
+	 * @return
 	 */
-	public static Subject getSubject(){
-		return SecurityUtils.getSubject();
-	}
-	
-	/**
-	 * 获取当前登录者对象
-	 */
-	public static SystemAuthorizingRealm.Principal getPrincipal(){
-		try{
-			Subject subject = SecurityUtils.getSubject();
-			SystemAuthorizingRealm.Principal principal = (SystemAuthorizingRealm.Principal)subject.getPrincipal();
-			if (principal != null){
-				return principal;
+	public static List<Role> getRoleList(){
+		@SuppressWarnings("unchecked")
+		List<Role> roleList = (List<Role>)getCache(CACHE_ROLE_LIST);
+		if (roleList == null){
+			User user = getUser();
+			if (user.isAdmin()){
+				roleList = roleDao.findAllList(new Role());
+			}else{
+				Role role = new Role();
+				role.getSqlMap().put("dsf", BaseService.dataScopeFilter(user.getCurrentUser(), "o", "u"));
+				roleList = roleDao.findList(role);
 			}
-//			subject.logout();
-		}catch (UnavailableSecurityManagerException e) {
-			
-		}catch (InvalidSessionException e){
-			
+			putCache(CACHE_ROLE_LIST, roleList);
 		}
-		return null;
+		return roleList;
 	}
 
 	/**
@@ -124,22 +165,153 @@ public class UserUtils {
 	}
 
 	/**
-	 * 根据登录名获取用户
-	 * @param loginName
-	 * @return 取不到返回null
+	 * 获取当前用户授权菜单(子菜单包含在父菜单对象里)
+	 * @return
 	 */
-	public static User getByLoginName(String loginName){
-		User user = (User) CacheUtils.get(USER_CACHE, USER_CACHE_LOGIN_NAME_ + loginName);
-		if (user == null){
-			user = userDao.getByLoginName(new User(null, loginName));
-			if (user == null){
-				return null;
+	public static List<Menu> getTreeMenuList(Boolean all){
+		@SuppressWarnings("unchecked")
+		List<Menu> menuList = (List<Menu>)getCache(CACHE_TREE_MENU_LIST);
+		//if (menuList == null){
+		List<Menu> result = new ArrayList<Menu>();
+		menuList = getMenuList();
+		Map<String,Menu> map = new HashMap<String,Menu>();
+		for(Menu menu:menuList){
+			map.put(menu.getId(),menu);
+			if(menu.getParentId().equals(Menu.getRootId())){
+				result.add(menu);
 			}
-			user.setRoleList(roleDao.findList(new Role(user)));
-			CacheUtils.put(USER_CACHE, USER_CACHE_ID_ + user.getId(), user);
-			CacheUtils.put(USER_CACHE, USER_CACHE_LOGIN_NAME_ + user.getLoginName(), user);
 		}
-		return user;
+		for(Menu menu:menuList){
+			String pid = menu.getParentId();
+			if(map.get(pid) != null && (menu.getIsShow().equals("1")||all)){
+				map.get(pid).getSubMenu().add(menu);
+			}
+		}
+		menuList.clear();
+		menuList = result;
+		putCache(CACHE_TREE_MENU_LIST, menuList);
+		//}
+		return menuList;
+	}
+
+	/**
+	 * 获取当前用户授权的区域
+	 * @return
+	 */
+	public static List<Area> getAreaList(){
+		@SuppressWarnings("unchecked")
+		List<Area> areaList = (List<Area>)getCache(CACHE_AREA_LIST);
+		if (areaList == null){
+			areaList = areaDao.findAllList(new Area());
+			List<Area> result = new ArrayList<Area>();
+			Map<String,Area> map = new HashMap<String,Area>();
+			for(Area area:areaList){
+				map.put(area.getId(),area);
+				if(area.getParentId().equals(Area.getRootId())){
+					result.add(area);
+				}
+			}
+			for(Area area:areaList){
+				String pid = area.getParentId();
+				if(map.get(pid) != null){
+					map.get(pid).getSubArea().add(area);
+				}
+			}
+			areaList.clear();
+			areaList=result;
+			putCache(CACHE_AREA_LIST, areaList);
+		}
+		return areaList;
+	}
+
+	/**
+	 * 获取当前用户有权限访问的部门
+	 * @return
+	 */
+	public static List<Office> getOfficeList(){
+		@SuppressWarnings("unchecked")
+		List<Office> officeList = (List<Office>)getCache(CACHE_OFFICE_LIST);
+		if (officeList == null){
+			User user = getUser();
+			if (user.isAdmin()){
+				officeList = convertOfficeTree(officeDao.findAllList(new Office()));
+			}else{
+				Office office = new Office();
+				office.getSqlMap().put("dsf", BaseService.dataScopeFilter(user, "a", ""));
+				officeList = convertOfficeTree(officeDao.findList(office));
+			}
+			putCache(CACHE_OFFICE_LIST, officeList);
+		}
+		return officeList;
+	}
+
+	/**
+	 * 获取当前用户有权限访问的部门
+	 * @return
+	 */
+	public static List<Office> getOfficeAllList(){
+		@SuppressWarnings("unchecked")
+		List<Office> officeList = (List<Office>)getCache(CACHE_OFFICE_ALL_LIST);
+		if (officeList == null){
+			officeList = convertOfficeTree(officeDao.findAllList(new Office()));
+		}
+		return officeList;
+	}
+
+	private static List<Office> convertOfficeTree(List<Office> officeList) {
+		List<Office> result = new ArrayList<Office>();
+		Map<String,Office> map = new HashMap<String,Office>();
+		for(Office office:officeList){
+			map.put(office.getId(),office);
+			if(office.getParentId().equals(Office.getRootId())){
+				result.add(office);
+			}
+		}
+		for(Office office:officeList){
+			String pid = office.getParentId();
+			if(map.get(pid) != null){
+				map.get(pid).getSubOffice().add(office);
+			}
+		}
+		officeList.clear();
+		return result;
+	}
+
+	public static List<Office> getCompanys() {
+		Office office = new Office();
+		office.setType("1");
+		List<Office> companys = officeDao.getCompanys(office);
+		return companys;
+	}
+
+	public static Office getCompany(String officeId) {
+		Office company = officeDao.get(new Office(officeId)).getCompany();
+		return company;
+	}
+
+	/**
+	 * 获取授权主要对象
+	 */
+	public static Subject getSubject(){
+		return SecurityUtils.getSubject();
+	}
+	
+	/**
+	 * 获取当前登录者对象
+	 */
+	public static SystemAuthorizingRealm.Principal getPrincipal(){
+		try{
+			Subject subject = SecurityUtils.getSubject();
+			SystemAuthorizingRealm.Principal principal = (SystemAuthorizingRealm.Principal)subject.getPrincipal();
+			if (principal != null){
+				return principal;
+			}
+		}catch (UnavailableSecurityManagerException e) {
+			e.printStackTrace();
+		}catch (InvalidSessionException e){
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public static Session getSession(){
@@ -152,7 +324,6 @@ public class UserUtils {
 			if (session != null){
 				return session;
 			}
-//			subject.logout();
 		}catch (InvalidSessionException e){
 			
 		}
@@ -166,20 +337,16 @@ public class UserUtils {
 	}
 	
 	public static Object getCache(String key, Object defaultValue) {
-//		Object obj = getCacheMap().get(key);
 		Object obj = getSession().getAttribute(key);
 		return obj==null?defaultValue:obj;
 	}
 
 	public static void putCache(String key, Object value) {
-//		getCacheMap().put(key, value);
 		getSession().setAttribute(key, value);
 	}
 
 	public static void removeCache(String key) {
-//		getCacheMap().remove(key);
 		getSession().removeAttribute(key);
 	}
 
-	
 }

@@ -17,7 +17,7 @@ public interface UserDao extends CrudDao<User> {
 	
 	/**
 	 * 根据登录名称查询用户
-	 * @param loginName
+	 * @param user
 	 * @return
 	 */
 	User getByLoginName(User user);
@@ -79,18 +79,17 @@ public interface UserDao extends CrudDao<User> {
 	List<Menu> findMenuListByUser(String id);
 
 
-//	/**
-//	 * 查询没有密码的用户
-//	 * 
-//	 */
-//	List<User> findNopasswordUser();
-
 	/**
 	 * 批量修改用户密码
-	 * @param entryptPassword 
-	 * @param users
+	 * @param entryptPassword
 	 */
 	int updateNoPwdUser(String entryptPassword);
 	
 	List<User> findUserList(String roleId);
+
+	/**
+	 * 设置用户禁止登录
+	 * @param user
+	 */
+	void updateLoginDisabled(User user);
 }

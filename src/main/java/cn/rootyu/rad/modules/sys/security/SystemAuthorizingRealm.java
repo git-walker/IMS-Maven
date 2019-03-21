@@ -1,15 +1,25 @@
 package cn.rootyu.rad.modules.sys.security;
 
+import cn.rootyu.rad.common.config.Global;
+import cn.rootyu.rad.common.utils.Encodes;
 import cn.rootyu.rad.common.utils.SpringContextHolder;
+import cn.rootyu.rad.modules.sys.entity.Menu;
+import cn.rootyu.rad.modules.sys.entity.Role;
 import cn.rootyu.rad.modules.sys.entity.User;
 import cn.rootyu.rad.modules.sys.service.SystemService;
 import cn.rootyu.rad.modules.sys.utils.UserUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.Permission;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
+import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.util.ByteSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -35,7 +45,25 @@ public class SystemAuthorizingRealm extends AuthorizingRealm {
 	 */
 	@Override
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authcToken) {
-		return null;
+		UsernamePasswordToken token = (UsernamePasswordToken) authcToken;
+
+		int activeSessionSize = getSystemService().getSessionDao().getActiveSessions(false).size();
+		if (logger.isDebugEnabled()){
+			logger.debug("login submit, active session size: {}, username: {}", activeSessionSize, token.getUsername());
+		}
+
+		// 校验用户名密码
+		User user = getSystemService().getUserByLoginName(token.getUsername());
+		if (user != null) {
+			if (Global.NO.equals(user.getLoginFlag())){
+				throw new AuthenticationException("msg:该已帐号禁止登录.");
+			}
+			byte[] salt = Encodes.decodeHex(user.getPassword().substring(0,16));
+			return new SimpleAuthenticationInfo(new Principal(user),
+					user.getPassword().substring(16), ByteSource.Util.bytes(salt), getName());
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -43,7 +71,49 @@ public class SystemAuthorizingRealm extends AuthorizingRealm {
 	 */
 	@Override
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-		return null;
+
+		Principal principal = (Principal) getAvailablePrincipal(principals);
+		// 获取当前已登录的用户
+		if (!Global.TRUE.equals(Global.getConfig("user.multiAccountLogin"))){
+			Collection<Session> sessions = getSystemService().getSessionDao().getActiveSessions(true, principal, UserUtils.getSession());
+			if (sessions.size() > 0){
+				// 如果是登录进来的，则踢出已在线用户
+				if (UserUtils.getSubject().isAuthenticated()){
+					for (Session session : sessions){
+						getSystemService().getSessionDao().delete(session);
+					}
+				}
+				// 记住我进来的，并且当前用户已登录，则退出当前用户提示信息。
+				else{
+					UserUtils.getSubject().logout();
+					throw new AuthenticationException("msg:账号已在其它地方登录，请重新登录。");
+				}
+			}
+		}
+		User user = getSystemService().getUserByLoginName(principal.getLoginName());
+		if (user != null) {
+			SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
+			List<Menu> list = UserUtils.getMenuList();
+			for (Menu menu : list){
+				if (StringUtils.isNotBlank(menu.getPermission())){
+					// 添加基于Permission的权限信息
+					for (String permission : StringUtils.split(menu.getPermission(),",")){
+						info.addStringPermission(permission);
+					}
+				}
+			}
+			// 添加用户权限
+			info.addStringPermission("user");
+			// 添加用户角色信息
+			for (Role role : user.getRoleList()){
+				info.addRole(role.getEnname());
+			}
+			// 更新登录IP和时间
+			getSystemService().updateUserLoginInfo(user);
+			return info;
+		} else {
+			return null;
+		}
 	}
 	
 	@Override
@@ -106,14 +176,12 @@ public class SystemAuthorizingRealm extends AuthorizingRealm {
 		private String id; // 编号
 		private String loginName; // 登录名
 		private String name; // 姓名
-		private boolean mobileLogin; // 是否手机登录
 
 
-		public Principal(User user, boolean mobileLogin) {
+		public Principal(User user) {
 			this.id = user.getId();
 			this.loginName = user.getLoginName();
 			this.name = user.getName();
-			this.mobileLogin = mobileLogin;
 		}
 
 		public String getId() {
@@ -128,9 +196,6 @@ public class SystemAuthorizingRealm extends AuthorizingRealm {
 			return name;
 		}
 
-		public boolean isMobileLogin() {
-			return mobileLogin;
-		}
 
 		/**
 		 * 获取SESSIONID
