@@ -10,8 +10,6 @@ import java.util.UUID;
 
 /**
  * 封装生成唯一性ID算法的工具类.
- * @author yuhui
- * @version 1.0
  */
 @Service
 @Lazy(false)

@@ -1,18 +1,17 @@
-/**
- * Copyright &copy; 2012-2014 <a href="http://www.dhc.com.cn">DHC</a> All rights reserved.
- */
 package cn.rootyu.rad.common.config;
 
 import cn.rootyu.rad.common.utils.PropertiesLoader;
 import cn.rootyu.rad.common.utils.StringUtils;
+import cn.rootyu.rad.common.web.Servlets;
+import com.google.common.collect.Maps;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 全局配置类
- * @author DHC
- * @version 2014-06-25
+ * @author yuhui
+ * @version 1.0
  */
 public class Global {
 
@@ -24,7 +23,7 @@ public class Global {
 	/**
 	 * 保存全局属性值
 	 */
-	private static Map<String, String> map =new HashMap();
+	private static Map<String, String> map = Maps.newHashMap();
 	
 	/**
 	 * 属性文件加载对象
@@ -63,7 +62,7 @@ public class Global {
 	
 	/**
 	 * 获取配置
-	 * @see ${fns:getConfig('adminPath')}
+	 * ${fns:getConfig('adminPath')}
 	 */
 	public static String getConfig(String key) {
 		String value = map.get(key);
@@ -80,14 +79,7 @@ public class Global {
 	public static String getAdminPath() {
 		return getConfig("adminPath");
 	}
-	
-	/**
-	 * 获取前端根路径
-	 */
-	public static String getFrontPath() {
-		return getConfig("frontPath");
-	}
-	
+
 	/**
 	 * 获取URL后缀
 	 */
@@ -105,7 +97,7 @@ public class Global {
     
 	/**
 	 * 页面获取常量
-	 * @see ${fns:getConst('YES')}
+	 * ${fns:getConst('YES')}
 	 */
 	public static Object getConst(String field) {
 		try {
@@ -114,6 +106,35 @@ public class Global {
 			// 异常代表无配置，这里什么也不做
 		}
 		return null;
+	}
+
+	/**
+	 * 获取文件上传根路径
+	 * @return
+	 */
+	public static String getBaseDir(){
+		String dir = getConfig("userfiles.basedir");
+		Objects.requireNonNull(dir,"请设置文件上传根路径");
+		return dir;
+	}
+
+	/**
+	 * 获取上传文件的根目录
+	 * @return
+	 */
+	public static String getUserfilesBaseDir() {
+		String dir = getConfig("userfiles.basedir");
+		if (StringUtils.isBlank(dir)){
+			try {
+				dir = Servlets.getServletContext().getRealPath("/");
+			} catch (Exception e) {
+				return "";
+			}
+		}
+		if(!dir.endsWith("/")) {
+			dir += "/";
+		}
+		return dir;
 	}
 	
 }

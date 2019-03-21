@@ -19,13 +19,6 @@
     <example>${fns:getAdminPath()}</example>
   </function>
   <function>
-    <description>获取网站路径</description>
-    <name>getFrontPath</name>
-    <function-class>cn.rootyu.rad.common.config.Global</function-class>
-    <function-signature>java.lang.String getFrontPath()</function-signature>
-    <example>${fns:getFrontPath()}</example>
-  </function>
-  <function>
     <description>获取网站URL后缀</description>
     <name>getUrlSuffix</name>
     <function-class>cn.rootyu.rad.common.config.Global</function-class>
@@ -72,36 +65,12 @@
     <example>${fns:getPrincipal()}</example>  
   </function>
   
-  <function>
-    <description>获取当前用户的菜单对象列表(树型带子菜单)</description>
-    <name>getTreeMenuList</name>
-    <function-class>cn.rootyu.rad.modules.sys.utils.UserUtils</function-class>
-    <function-signature>java.util.List getTreeMenuList(java.lang.Boolean)</function-signature>
-    <example>${fns:getTreeMenuList(all)}</example>  
-  </function>
-  
    <function>
     <description>获取当前用户的菜单对象列表</description>
     <name>getMenuList</name>
     <function-class>cn.rootyu.rad.modules.sys.utils.UserUtils</function-class>
     <function-signature>java.util.List getMenuList()</function-signature>
     <example>${fns:getMenuList()}</example>  
-  </function>
-  
-  <function>
-    <description>获取当前用户的区域对象列表</description>
-    <name>getAreaList</name>
-    <function-class>cn.rootyu.rad.modules.sys.utils.UserUtils</function-class>
-    <function-signature>java.util.List getAreaList()</function-signature>
-    <example>${fns:getAreaList()}</example>  
-  </function>
-  
-  <function>
-    <description>获取当前用户的部门对象列表</description>
-    <name>getOfficeList</name>
-    <function-class>cn.rootyu.rad.modules.sys.utils.UserUtils</function-class>
-    <function-signature>java.util.List getOfficeList()</function-signature>
-    <example>${fns:getOfficeList()}</example>  
   </function>
   
   <function>
@@ -217,22 +186,6 @@
     <function-class>cn.rootyu.rad.common.utils.StringUtils</function-class>
     <function-signature>java.lang.String jsGetVal(java.lang.String)</function-signature>
     <example>${fns:jsGetVal('row.user.id')}  返回：!row?'':!row.user?'':!row.user.id?'':row.user.id</example>  
-  </function>
-  
-  <!-- DateUtils -->
-  <function>
-    <description>获取当前日期</description>
-    <name>getDate</name>
-    <function-class>cn.rootyu.rad.common.utils.DateUtils</function-class>
-    <function-signature>java.lang.String getDate(java.lang.String)</function-signature>
-    <example>${fns:getDate(pattern)}</example>  
-  </function>
-  <function>
-    <description>获取过去的天数</description>
-    <name>pastDays</name>
-    <function-class>cn.rootyu.rad.common.utils.DateUtils</function-class>
-    <function-signature>long pastDays(java.util.Date)</function-signature>
-    <example>${fns:pastDays(date)}</example>  
   </function>
   
 </taglib>

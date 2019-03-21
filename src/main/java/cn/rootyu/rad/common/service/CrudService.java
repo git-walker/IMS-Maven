@@ -1,10 +1,8 @@
-/**
- * Copyright &copy; 2012-2014 <a href="http://www.dhc.com.cn">DHC</a> All rights reserved.
- */
 package cn.rootyu.rad.common.service;
 
 import cn.rootyu.rad.common.dao.CrudDao;
 import cn.rootyu.rad.common.entity.DataEntity;
+import com.github.pagehelper.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,8 +10,8 @@ import java.util.List;
 
 /**
  * Service基类
- * @author DHC
- * @version 2014-05-16
+ * @author yuhui
+ * @version 1.0
  */
 @Transactional(readOnly = true)
 public abstract class CrudService<D extends CrudDao<T>, T extends DataEntity<T>> extends BaseService {
@@ -50,18 +48,6 @@ public abstract class CrudService<D extends CrudDao<T>, T extends DataEntity<T>>
 	public List<T> findList(T entity) {
 		return dao.findList(entity);
 	}
-	
-	/**
-	 * 查询分页数据
-	 * @param page 分页对象
-	 * @param entity
-	 * @return
-	 */
-//	public Page<T> findPage(Page<T> page, T entity) {
-//		entity.setPage(page);
-//		page.setList(dao.findList(entity));
-//		return page;
-//	}
 
 	/**
 	 * 保存数据（插入或更新）

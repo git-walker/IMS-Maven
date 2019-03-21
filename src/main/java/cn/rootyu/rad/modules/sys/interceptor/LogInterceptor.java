@@ -12,13 +12,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
 
 /**
- * @ClassName LogInterceptor
- * @Description TODO
- * @Author yuhui
- * @Date 2019/3/18 20:28
- * @Version 1.0
+ * 日志拦截器
  */
 public class LogInterceptor extends BaseService implements HandlerInterceptor {
+
     private static final ThreadLocal<Long> startTimeThreadLocal =
             new NamedThreadLocal<Long>("ThreadLocal StartTime");
 
@@ -49,6 +46,7 @@ public class LogInterceptor extends BaseService implements HandlerInterceptor {
         // 保存日志
         String uri = request.getContextPath()+ Global.getAdminPath()+"/sys/notify/count";
         if(!request.getRequestURI().equals(uri)){
+//            LogUtils.saveLog(request, handler, ex, null);
 
             // 打印JVM信息。
             if (logger.isDebugEnabled()){
@@ -62,4 +60,5 @@ public class LogInterceptor extends BaseService implements HandlerInterceptor {
         }
 
     }
+
 }
